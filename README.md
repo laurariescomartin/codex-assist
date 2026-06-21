@@ -43,6 +43,16 @@ Implementación de métricas de evaluación para validar la calidad de las respu
 
 ---
 
+## ⚙️ Configuración del Entorno (Importante)
+
+Por motivos de seguridad, las credenciales de acceso no se incluyen en el repositorio. Para ejecutar el proyecto correctamente, hay que seguir estos pasos:
+
+1. Crear un archivo llamado `.env` en la raíz del proyecto.
+2. Copiar el contenido del archivo `.env.example` proporcionado.
+3. Completar los valores con tus credenciales personales (API Key de OpenAI, Token de administrador, etc.).
+
+---
+
 ## 🚀 Instalación y Despliegue
 
 ```bash
