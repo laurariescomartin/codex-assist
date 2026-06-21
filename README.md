@@ -57,6 +57,7 @@ cp .env.example .env
 
 # Desplegar con Docker
 docker-compose up --build
+```
 
 ---
 
@@ -67,9 +68,5 @@ A continuación, se incluye una breve demostración donde se puede observar la i
 https://github.com/user-attachments/assets/0fb30b1c-d64b-4173-8ee2-cccc7b911cd7
 
 ---
-
-## 📜 Licencia
-
-Este proyecto se encuentra bajo la licencia **MIT**. Consulta el archivo `LICENSE` en este repositorio para obtener más información sobre los permisos y limitaciones de uso.
 
 *Desarrollado como Trabajo de Fin de Grado en la UPSA (Curso 2025-2026).*
