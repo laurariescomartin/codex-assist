@@ -1,82 +1,195 @@
-# 🚀 CodexAssist - AI-Powered Software Engineering Assistant
+# CodexAssist — AI-Powered Software Engineering Assistant
 
-CodexAssist es una plataforma de software diseñada para optimizar la comprensión y navegación de proyectos complejos mediante el uso de modelos de lenguaje (LLM) y técnicas de **Retrieval-Augmented Generation (RAG)**. Desarrollado como Trabajo de Fin de Grado (UPSA, 2026), el sistema permite a los ingenieros realizar consultas técnicas sobre el código fuente local, mitigando las alucinaciones típicas de los LLMs al basar las respuestas estrictamente en el contexto del repositorio.
+CodexAssist is an AI-powered software engineering assistant developed as a Final Degree Project at Universidad Pontificia de Salamanca (UPSA) during the 2025–2026 academic year.
 
----
+The platform helps developers understand and navigate codebases by combining Large Language Models (LLMs) with Retrieval-Augmented Generation (RAG). It retrieves relevant source code from a project and uses that context to generate answers to technical questions, helping developers explore unfamiliar codebases more efficiently.
 
-## Proceso de Desarrollo y Fases del Proyecto
+## Key Features
 
-El proyecto se estructuró en 5 fases de ingeniería, garantizando un crecimiento escalable del código:
+- Codebase ingestion and source file processing
+- Semantic search over code using vector embeddings
+- Retrieval-Augmented Generation (RAG) for repository-specific questions
+- Context-aware responses grounded in retrieved source code
+- Conversational interface for technical queries
+- Modular architecture separating ingestion, retrieval, and response generation
+- Configurable model and retrieval settings
+- Environment-based configuration for credentials
+- Docker-based deployment
 
-### Fase 1: Ingestión y Pipeline de Datos
-Diseño de un pipeline encargado de la lectura recursiva de repositorios, pre-procesamiento del código fuente y limpieza de metadatos. Se implementaron algoritmos de *chunking* optimizados para la estructura de archivos de programación, asegurando que el contexto semántico de funciones y clases se mantenga íntegro antes de la vectorización.
+## Architecture and Workflow
 
-### Fase 2: Motor de Recuperación Semántica
-Implementación de una base de datos vectorial para el almacenamiento y búsqueda de embeddings. El sistema utiliza técnicas de búsqueda por similitud coseno para encontrar los fragmentos de código más relevantes ante una consulta en lenguaje natural.
+### 1. Code Ingestion
 
-### Fase 3: Orquestación y Generación de Respuestas
-Configuración del flujo de razonamiento mediante frameworks de orquestación de IA. Se ajustó el *prompt engineering* para obligar al modelo a citar el código fuente exacto que justifica su respuesta, garantizando que el asistente actúe bajo las directrices del contexto proporcionado.
+The ingestion pipeline processes project files and prepares source code for semantic retrieval.
 
-### Fase 4: Interfaz Conversacional y UX
-Desarrollo de una interfaz web intuitiva orientada a desarrolladores. Se implementó un sistema de chat asíncrono con *syntax highlighting* y referencia directa a los archivos consultados.
+- Recursively reads supported project files
+- Filters irrelevant files and directories
+- Splits source code into manageable chunks
+- Preserves file metadata to support source traceability
 
-### Fase 5: Evaluación y Optimización
-Implementación de métricas de evaluación para validar la calidad de las respuestas (RAG Triad: Context Relevance, Groundedness, Answer Relevance) y ajuste de parámetros (temperatura, top-k) para maximizar la utilidad técnica.
+### 2. Semantic Retrieval
 
----
+Processed code chunks are converted into vector embeddings and stored in a vector database.
 
-## Buenas Prácticas de Ingeniería e IA
+When a developer submits a question, the retrieval component searches for semantically relevant code fragments to provide context for the response.
 
-* **Integridad de Datos:** Garantía de que el análisis se mantiene privado, ideal para repositorios corporativos o código sensible.
-* **Diseño Modular:** Arquitectura desacoplada que permite intercambiar el LLM o la base vectorial sin afectar la lógica de negocio.
-* **Optimización de Contexto:** Filtrado inteligente de archivos irrelevantes (dependencias, logs, config) para evitar el "ruido" en la ventana de contexto del LLM.
+### 3. Context-Aware Answer Generation
 
----
+The retrieved code context is passed to the language model to generate an answer relevant to the repository.
 
-## Stack Tecnológico
+The assistant is designed to base its explanations on retrieved source code and provide useful references to the relevant files. Retrieval and source references help users verify responses, although they do not guarantee that every generated statement is correct.
 
-* **IA/LLM:** LangChain, [OpenAI / Local LLM].
-* **Bases de Datos Vectoriales:** [ChromaDB / Pinecone / Weaviate].
-* **Backend:** [FastAPI / Python].
-* **Frontend:** [React / Next.js].
-* **Entorno:** Docker, Docker Compose.
+### 4. Conversational Interface
 
----
+The web interface allows developers to ask questions about a codebase and review generated explanations.
 
-## ⚙️ Configuración del Entorno (Importante)
+The goal is to make repository exploration more intuitive and reduce the time required to locate and understand relevant implementation details.
 
-Por motivos de seguridad, las credenciales de acceso no se incluyen en el repositorio. Para ejecutar el proyecto correctamente, hay que seguir estos pasos:
+### 5. Evaluation and Optimization
 
-1. Crear un archivo llamado `.env` en la raíz del proyecto.
-2. Copiar el contenido del archivo `.env.example` proporcionado.
-3. Completar los valores con tus credenciales personales (API Key de OpenAI, Token de administrador, etc.).
+RAG systems can be evaluated across several dimensions:
 
----
+- **Context relevance:** whether retrieved chunks are relevant to the question
+- **Groundedness:** whether the answer is supported by the retrieved context
+- **Answer relevance:** whether the response addresses the original question
 
-## 🚀 Instalación y Despliegue
+Retrieval parameters, including the number of retrieved chunks (`top-k`), can be tuned to improve the relevance and usefulness of responses.
 
-```bash
-# Clonar el repositorio
-git clone [https://github.com/tu-usuario/codex-assist.git](https://github.com/tu-usuario/codex-assist.git)
+## Engineering Principles
 
-# Instalar dependencias
-npm install 
+### Modular Architecture
 
-# Configurar variables de entorno
-cp .env.example .env
+The ingestion, retrieval, and generation components are separated to make the system easier to maintain and extend.
 
-# Desplegar con Docker
-docker-compose up --build
+### Context Optimization
+
+Filtering irrelevant files and splitting source code into chunks helps reduce noise in the retrieval process and makes better use of the model's context window.
+
+### Source Traceability
+
+File metadata and retrieved code snippets help developers trace answers back to the project and independently verify the explanations.
+
+### Credential Management
+
+API credentials and other sensitive configuration values are provided through environment variables rather than hardcoded into application source files.
+
+### Privacy Considerations
+
+Code privacy depends on the configured model provider and application settings. When using a hosted LLM API, the relevant code context may be sent to that provider for processing. Sensitive repositories should only be used in accordance with the provider's terms and the project's data-handling configuration.
+
+## Technology Stack
+
+| Category | Technologies |
+|---|---|
+| Language | Python |
+| Backend / API | FastAPI |
+| AI Orchestration | LangChain |
+| Language Model | OpenAI |
+| Vector Database | ChromaDB |
+| Database | SQLite |
+| Frontend | Streamlit |
+| Containerization | Docker, Docker Compose |
+| Configuration | Environment variables, `.env` |
+
+## Project Structure
+
+The project is organized around the main components of the RAG workflow.
+
+```text
+app/
+├── ingestion/
+├── retrieval/
+├── generation/
+├── api/
+└── ...
+
+tests/
+data/
+.env.example
+Dockerfile
+docker-compose.yml
+requirements.txt
+README.md
 ```
 
----
+*Adjust this structure to match the actual repository layout.*
 
-## 📺 Demostración Funcional
+## Configuration
 
-A continuación, se incluye una breve demostración donde se puede observar la interfaz de usuario en acción, el sistema de navegación dinámico y el comportamiento de la plataforma analizando un repositorio en un entorno local:
+Credentials are not intended to be committed to the repository.
 
-https://github.com/user-attachments/assets/0fb30b1c-d64b-4173-8ee2-cccc7b911cd7
+1. Create a local `.env` file in the project root.
+2. Use `.env.example` as a template.
+3. Add the required configuration values, including the API key if the selected model requires one.
+4. Keep `.env` excluded from Git.
 
----
+Never commit real API keys, passwords, or administrative tokens.
 
-*Desarrollado como Trabajo de Fin de Grado en la UPSA (Curso 2025-2026).*
+## Installation and Deployment
+
+Clone the repository:
+
+```bash
+git clone https://github.com/laurariescomartin/codex-assist.git
+cd codex-assist
+```
+
+Install the Python dependencies:
+
+```bash
+python -m venv .venv
+```
+
+Activate the virtual environment.
+
+On Linux or macOS:
+
+```bash
+source .venv/bin/activate
+```
+
+On Windows PowerShell:
+
+```powershell
+.venv\Scripts\Activate.ps1
+```
+
+Install the dependencies:
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+Configure the environment:
+
+```bash
+cp .env.example .env
+```
+
+On Windows, you can copy the file using:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Complete the required values in `.env` before launching the application.
+
+### Docker
+
+If the Docker Compose configuration is ready to use:
+
+```bash
+docker compose up --build
+```
+
+Consult the application's configuration and startup instructions for the correct service URL and any additional setup requirements.
+
+## Functional Demo
+
+The following video demonstrates the interface and the platform's workflow when analyzing a repository in a local environment.
+
+[Watch the CodexAssist demo](https://github.com/user-attachments/assets/0fb30b1c-d64b-4173-8ee2-cccc7b911cd7)
+
+## Project Context
+
+Developed as a Final Degree Project (*Trabajo de Fin de Grado*) at Universidad Pontificia de Salamanca (UPSA) during the 2025–2026 academic year.
